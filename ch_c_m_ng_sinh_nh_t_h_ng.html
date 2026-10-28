@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật Hương :3</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        night: '#0a0518',
+                        midnight: '#130b2b',
+                        roseGold: '#e8a598',
+                        softPink: '#f472b6',
+                        warmGold: '#fbbf24',
+                        glowPink: '#ff2a85',
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        cursive: ['Dancing Script', 'cursive'],
+                        vibes: ['Great Vibes', 'cursive'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'float-slow': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.6', filter: 'drop-shadow(0 0 15px rgba(244,114,182,0.6))' },
+                            '50%': { opacity: '1', filter: 'drop-shadow(0 0 30px rgba(244,114,182,0.9))' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar & Glassmorphism Utility Styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0518;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b644;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f472b6aa;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-pink {
+            background: rgba(244, 114, 182, 0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 114, 182, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(244, 114, 182, 0.15);
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(244, 114, 182, 0.6), 0 0 40px rgba(232, 165, 152, 0.4);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #f472b6 50%, #e8a598 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-night text-slate-100 font-sans selection:bg-rose-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Canvas Particle Background -->
+    <canvas id="bgCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Floating Audio Control Widget -->
+    <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+        <button id="musicToggle" class="glass-card w-12 h-12 rounded-full flex items-center justify-center text-roseGold hover:text-white transition-all duration-300 shadow-lg shadow-pink-500/20 hover:scale-110 active:scale-95 group">
+            <i id="musicIcon" class="fas fa-music text-lg animate-spin-slow"></i>
+        </button>
+        <span id="musicLabel" class="glass-card text-xs px-3 py-1.5 rounded-full text-slate-300 pointer-events-none opacity-0 transition-opacity duration-300 font-medium">Bật nhạc nền 🎵</span>
+    </div>
+
+    <!-- MAIN HERO SECTION -->
+    <section id="heroSection" class="relative min-h-screen flex flex-col items-center justify-center p-6 z-10">
+        
+        <!-- Ambient Glowing Background Orbs -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <!-- Lock Screen / Present Box Container -->
+        <div id="unlockContainer" class="text-center max-w-xl mx-auto z-20 transition-all duration-1000">
+            <div class="inline-block px-4 py-1.5 rounded-full glass-card-pink text-pink-300 text-sm font-semibold tracking-widest uppercase mb-6 animate-pulse">
+                ✨ Món Quà Đặc Biệt Dành Riêng Cho Hương ✨
+            </div>
+            
+            <h1 class="font-vibes text-6xl md:text-8xl text-glow gradient-text mb-4">
+                Happy Birthday!
+            </h1>
+            <p class="text-slate-300 text-lg md:text-xl font-light mb-10 leading-relaxed">
+                Hôm nay là ngày tuyệt vời nhất, ngày mà 18 năm trước, một thiên thần nhỏ đã đến thế giới này. Xin kính chúc cậu tuổi mới thật rực rỡ, tràn đầy niềm vui và hạnh phúc.
+            </p>
+
+            <!-- Interactive Gift Box Button -->
+            <div class="relative group cursor-pointer inline-block my-4" id="openGiftBtn">
+                <div class="absolute -inset-4 bg-gradient-to-r from-pink-500 via-rose-400 to-amber-300 rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition duration-1000 animate-pulse-glow"></div>
+                
+                <div class="relative glass-card-pink px-10 py-12 rounded-3xl flex flex-col items-center justify-center border border-pink-400/40 group-hover:scale-105 transition-all duration-500">
+                    <div class="text-7xl mb-4 group-hover:scale-110 transition-transform duration-500 animate-bounce">
+                        🎁
+                    </div>
+                    <span class="font-semibold text-lg text-white tracking-wider uppercase flex items-center gap-2">
+                        <span>Chạm để mở quà</span>
+                        <i class="fas fa-sparkles text-amber-300"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unlocked Main Content Banner -->
+        <div id="heroContent" class="text-center max-w-3xl mx-auto hidden opacity-0 transition-all duration-1000 transform translate-y-10">
+            <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-card text-pink-300 text-sm mb-6 border border-pink-500/30">
+                <i class="fas fa-heart text-pink-500 animate-pulse"></i>
+                <span class="font-medium tracking-wide">Gửi Hương</span>
+            </div>
+
+            <h1 class="font-serif text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">
+                Chúc Mừng Sinh Nhật 18 tuổi <br>
+                <span class="font-vibes text-7xl md:text-9xl gradient-text text-glow block mt-2">Nàng Thơ</span>
+            </h1>
+
+            <p class="text-slate-300 text-lg md:text-2xl font-light italic mb-10 leading-relaxed max-w-2xl mx-auto">
+                Hôm nay là ngày tuyệt vời nhất, ngày mà 18 năm trước, một thiên thần nhỏ đã đến với thế giới này. Xin kính chúc cậu tuổi mới thật rực rỡ, tràn đầy niềm vui và hạnh phúc.
+                Tuổi 18, một bước ngoặt quan trọng trong cuộc đời, cậu hãy cứ tự tin, mạnh mẽ tỏa sáng trong cuộc đời của chính mình, sáng như vì tinh tú trên bầu trời rộng lớn luôn hehehe.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="#lanternSection" class="px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                    <span>Thả Đèn Ước Nguyện</span>
+                    <i class="fas fa-lantern text-amber-300"></i>
+                </a>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECTION 2: THẢ ĐÈN TRỜI ƯỚC NGƯỆN -->
+    <section id="lanternSection" class="py-20 px-6 relative z-10 max-w-4xl mx-auto text-center">
+        <div class="glass-card-pink p-8 md:p-14 rounded-3xl border border-pink-500/30 relative">
+            <h2 class="font-vibes text-5xl md:text-6xl text-glow gradient-text mb-4">Gửi Ước Nguyện Lên Bầu Trời Sao</h2>
+            <p class="text-slate-300 text-sm md:text-base font-light mb-8 max-w-xl mx-auto leading-relaxed">
+                Hãy nhập điều ước tuổi 18 của Hương vào đây. Chiếc đèn trời sẽ mang tâm tư của Hương tỏa sáng vút bay lên bầu trời sao✨
+            </p>
+
+            <form id="wishForm" onsubmit="handleWishSubmit(event)" class="max-w-md mx-auto space-y-4">
+                <input type="text" id="wishInput" required placeholder="Nhập điều ước tuổi 18 của Hương tại đây..." class="w-full px-6 py-4 rounded-full glass-card text-white placeholder-slate-400 focus:outline-none focus:border-pink-500 border border-white/10 text-center font-light transition-all">
+                <button type="submit" id="submitWishBtn" class="w-full py-4 rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-pink-500 text-white font-semibold shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-lantern text-amber-200"></i>
+                    <span id="btnText">Thả Đèn Trời</span>
+                </button>
+            </form>
+            
+            <div id="wishSuccessMsg" class="hidden mt-6 p-4 rounded-2xl glass-card text-pink-300 border border-pink-400/40 animate-fade-in">
+                ✨ Điều ước của Hương đã tỏa sáng vút bay vào bầu trời đêm ✨
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: REASONS WHY I LOVE YOU (INTERACTIVE FLIP CARDS) -->
+    <section class="py-24 px-4 relative z-10 max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="font-vibes text-5xl md:text-6xl text-glow gradient-text mb-3">Tuổi 18 rực rỡ !!!</h2>
+            <p class="text-slate-400 font-light text-base md:text-lg">Một vài điểm cuốn hút của Hương trong mắt Nguyên</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Card 1 -->
+            <div class="perspective-1000 h-64 cursor-pointer card-flip-trigger">
+                <div class="card-inner relative w-full h-full transform-style-3d">
+                    <div class="absolute inset-0 glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-500/20 backface-hidden">
+                        <div class="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl mb-4">
+                            ✨
+                        </div>
+                        <h3 class="font-serif text-xl font-semibold text-white">Nụ Cười Rạng Rỡ</h3>
+                        <p class="text-xs text-pink-300/70 mt-2">Thứ 01 • Chạm để mở</p>
+                    </div>
+                    <div class="absolute inset-0 glass-card-pink rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-400/40 rotate-y-180 backface-hidden">
+                        <p class="text-sm text-slate-200 leading-relaxed font-light">
+                            "Nụ cười của Hương tựa như ánh nắng ấm áp chiếu sáng tâm hồn, khiến tui cảm thấy một sự tích cực, vui vẻ trong con người của cậu."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="perspective-1000 h-64 cursor-pointer card-flip-trigger">
+                <div class="card-inner relative w-full h-full transform-style-3d">
+                    <div class="absolute inset-0 glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-500/20 backface-hidden">
+                        <div class="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl mb-4">
+                            🌸
+                        </div>
+                        <h3 class="font-serif text-xl font-semibold text-white">Sự Dịu Dàng</h3>
+                        <p class="text-xs text-pink-300/70 mt-2">Thứ 02 • Chạm để mở</p>
+                    </div>
+                    <div class="absolute inset-0 glass-card-pink rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-400/40 rotate-y-180 backface-hidden">
+                        <p class="text-sm text-slate-200 leading-relaxed font-light">
+                            "Hương có một sự dịu dàng và tinh tế trong cách cư xử, luôn biết quan tâm và lắng nghe người khác. Biết nói ra điều gì khiến bản thân cảm thấy không thoải mái, là một điểm rất đáng quý."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="perspective-1000 h-64 cursor-pointer card-flip-trigger">
+                <div class="card-inner relative w-full h-full transform-style-3d">
+                    <div class="absolute inset-0 glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-500/20 backface-hidden">
+                        <div class="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl mb-4">
+                            💫
+                        </div>
+                        <h3 class="font-serif text-xl font-semibold text-white">Một sự đáng yêu đến lạ kì</h3>
+                        <p class="text-xs text-pink-300/70 mt-2">Thứ 03 • Chạm để mở</p>
+                    </div>
+                    <div class="absolute inset-0 glass-card-pink rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-400/40 rotate-y-180 backface-hidden">
+                        <p class="text-sm text-slate-200 leading-relaxed font-light">
+                            "Cậu có một cái vibe đáng yêu lắm nha, dường như được toát lên từ vẻ tích cực, vui vẻ, hay cười"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="perspective-1000 h-64 cursor-pointer card-flip-trigger">
+                <div class="card-inner relative w-full h-full transform-style-3d">
+                    <div class="absolute inset-0 glass-card rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-500/20 backface-hidden">
+                        <div class="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl mb-4">
+                            🎀
+                        </div>
+                        <h3 class="font-serif text-xl font-semibold text-white">Hãy luôn là chính mình</h3>
+                        <p class="text-xs text-pink-300/70 mt-2">Thứ 04 • Chạm để mở</p>
+                    </div>
+                    <div class="absolute inset-0 glass-card-pink rounded-3xl p-6 flex flex-col items-center justify-center text-center border border-pink-400/40 rotate-y-180 backface-hidden">
+                        <p class="text-sm text-slate-200 leading-relaxed font-light">
+                            "Hãy cứ là chính mình, chính sự tự nhiên, chân thành và đáng yêu của cậu cũng đã khiến mọi người xung quanh cảm thấy ấm áp và hạnh phúc."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 4: INTERACTIVE LOVE LETTER POPUP -->
+    <section class="py-24 px-6 relative z-10 max-w-4xl mx-auto text-center">
+        <div class="glass-card-pink p-10 md:p-16 rounded-3xl border border-pink-500/30 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-pink-500/10 rounded-full blur-2xl"></div>
+            
+            <h2 class="font-vibes text-5xl md:text-7xl text-glow gradient-text mb-6">Thư</h2>
+            <p class="text-slate-300 text-base md:text-lg mb-8 font-light leading-relaxed">
+                Hãy bấm vào nút bên dưới để nhận món quà bất ngờ nhé!
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="openLetterBtn" class="px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 via-rose-500 to-amber-400 text-white font-semibold shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                    <i class="fas fa-envelope-open-text text-lg"></i>
+                    <span>Mở Bức Thư</span>
+                </button>
+                <button onclick="triggerFireworks()" class="px-8 py-4 rounded-full glass-card text-pink-300 hover:text-white font-semibold border border-pink-500/30 hover:border-pink-500 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                    <i class="fas fa-sparkles text-amber-300"></i>
+                    <span>Bắn Pháo Hoa Mừng Sinh Nhật</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOVE LETTER MODAL POPUP -->
+    <div id="letterModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="glass-card-pink max-w-2xl w-full p-8 md:p-12 rounded-3xl border border-pink-400/40 relative transform scale-90 transition-all duration-500 shadow-2xl max-h-[85vh] overflow-y-auto" id="letterModalCard">
+            
+            <button id="closeLetterBtn" class="absolute top-6 right-6 w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-300 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <span class="text-4xl inline-block animate-bounce mb-2">💌</span>
+                <h3 class="font-vibes text-4xl text-glow gradient-text">Gửi Người dễ thương nhất thế giới :3</h3>
+            </div>
+
+            <div class="text-slate-200 text-base md:text-lg leading-relaxed font-light space-y-4 font-sans text-left" id="typingLetterText">
+                <!-- Auto Typing Content -->
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/10 text-right">
+                <p class="font-cursive text-2xl text-pink-300">Trân trọng,</p>
+                <p class="font-serif font-bold text-white tracking-wider mt-1"> Nguyên </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT CODE INTERACTION LOGIC -->
+    <script>
+        /* CONFIGURATION */
+        const CONFIG = {
+            FORMSPREE_ID: "YOUR_FORMSPREE_ID_HERE" // Paste your Formspree ID here
+        };
+
+        /* 1. CANVAS BACKGROUND PARTICLES & FLOATING HEARTS */
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height + height;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = Math.random() * 1.2 + 0.3;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.isHeart = Math.random() > 0.6;
+                this.color = this.isHeart ? '#f472b6' : '#e8a598';
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                if (this.y < -20) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                if (this.isHeart) {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    const d = this.size * 2;
+                    ctx.moveTo(this.x, this.y);
+                    ctx.bezierCurveTo(this.x - d / 2, this.y - d / 2, this.x - d, this.y + d / 3, this.x, this.y + d);
+                    ctx.bezierCurveTo(this.x + d, this.y + d / 3, this.x + d / 2, this.y - d / 2, this.x, this.y);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        const particles = Array.from({ length: 65 }, () => new Particle());
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        /* 2. SKY LANTERN RELEASE EFFECT & FORM SUBMISSION */
+        async function handleWishSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('wishInput');
+            const btn = document.getElementById('submitWishBtn');
+            const btnText = document.getElementById('btnText');
+            const successMsg = document.getElementById('wishSuccessMsg');
+            const wishText = input.value.trim();
+
+            if (!wishText) return;
+
+            btn.disabled = true;
+            btnText.innerText = "Đang gửi ước nguyện đến các vì sao";
+
+            releaseCustomLantern(wishText);
+            triggerFireworks();
+
+            try {
+                if (CONFIG.FORMSPREE_ID && CONFIG.FORMSPREE_ID !== "YOUR_FORMSPREE_ID_HERE") {
+                    await fetch(`https://formspree.io/f/${CONFIG.FORMSPREE_ID}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            wish: wishText,
+                            sender: "Hương",
+                            date: new Date().toLocaleString('vi-VN'),
+                            title: "Điều ước sinh nhật 18 tuổi từ Hương 🌟"
+                        })
+                    });
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            } catch (err) {
+                console.log("Wish released visually!", err);
+            }
+
+            btnText.innerText = "Đã Gửi Ước Nguyện ✨";
+            btn.classList.add('opacity-80');
+            successMsg.classList.remove('hidden');
+            input.value = '';
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btnText.innerText = "Thả Đèn Trời";
+                btn.classList.remove('opacity-80');
+            }, 5000);
+        }
+
+        function releaseCustomLantern(wishText) {
+            const lantern = document.createElement('div');
+            lantern.className = 'fixed z-40 pointer-events-none flex flex-col items-center transition-all duration-[20000ms] ease-out';
+            lantern.innerHTML = `
+                <div class="glass-card-pink px-4 py-2 rounded-full text-xs text-amber-200 border border-amber-400/50 mb-2 whitespace-nowrap shadow-xl animate-pulse">
+                    ✨ ${wishText}
+                </div>
+                <div class="text-5xl filter drop-shadow-[0_0_20px_rgba(251,191,36,1)]">🏮</div>
+            `;
+            lantern.style.left = `${Math.random() * 50 + 25}vw`;
+            lantern.style.bottom = '-100px';
+            document.body.appendChild(lantern);
+
+            setTimeout(() => {
+                lantern.style.transform = `translate(${(Math.random() - 0.5) * 160}px, -${window.innerHeight + 250}px) scale(0.5)`;
+                lantern.style.opacity = '0';
+            }, 50);
+
+            setTimeout(() => lantern.remove(), 20500);
+        }
+
+        /* 3. FLIP CARD INTERACTION */
+        const flipCards = document.querySelectorAll('.card-flip-trigger');
+        flipCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const inner = card.querySelector('.card-inner');
+                inner.classList.toggle('rotate-y-180');
+            });
+        });
+
+        /* 4. OPEN GIFT BOX & CONFETTI */
+        const openGiftBtn = document.getElementById('openGiftBtn');
+        const unlockContainer = document.getElementById('unlockContainer');
+        const heroContent = document.getElementById('heroContent');
+
+        openGiftBtn.addEventListener('click', () => {
+            confetti({
+                particleCount: 120,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+
+            playRomanticAudio();
+
+            unlockContainer.classList.add('opacity-0', 'scale-90');
+            setTimeout(() => {
+                unlockContainer.classList.add('hidden');
+                heroContent.classList.remove('hidden');
+                setTimeout(() => {
+                    heroContent.classList.remove('opacity-0', 'translate-y-10');
+                }, 50);
+            }, 800);
+        });
+
+        /* 5. FIREWORKS TRIGGER */
+        function triggerFireworks() {
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+
+        /* 6. LOVE LETTER TYPING EFFECT & MODAL */
+        const openLetterBtn = document.getElementById('openLetterBtn');
+        const closeLetterBtn = document.getElementById('closeLetterBtn');
+        const letterModal = document.getElementById('letterModal');
+        const letterModalCard = document.getElementById('letterModalCard');
+        const typingLetterText = document.getElementById('typingLetterText');
+
+        const letterMessage = `Gửi Hương, \n\nHôm nay là ngày vô cùng đặc biệt, ngày sinh nhật 18 tuổi của cậu. Nguyên cũng không có gì nhiều, nên làm ra cái này để mừng sinh nhật Hương thui. Xin gửi tặng Hương những lời chúc tốt đẹp nhất! \n\nChúc Hương tuổi mới ngày càng xinh đẹp, luôn vui vẻ, hạnh phúc, luôn yêu đời, tích cực trong cuộc sống. Lúc nào cũng mạnh khỏe, tươi tắn, có sức mạnh làm tất cả mọi thứ mình muốn, đạt được mục tiêu của mình. \n\n Mãi yêu.💕`;
+
+        let typingIndex = 0;
+        let isTyping = false;
+
+        function typeWriter() {
+            if (typingIndex < letterMessage.length) {
+                const char = letterMessage.charAt(typingIndex);
+                if (char === '\n') {
+                    typingLetterText.innerHTML += '<br>';
+                } else {
+                    typingLetterText.innerHTML += char;
+                }
+                typingIndex++;
+                setTimeout(typeWriter, 15);
+            }
+        }
+
+        openLetterBtn.addEventListener('click', () => {
+            letterModal.classList.remove('opacity-0', 'pointer-events-none');
+            letterModalCard.classList.remove('scale-90');
+            letterModalCard.classList.add('scale-100');
+            triggerFireworks();
+
+            if (!isTyping) {
+                isTyping = true;
+                typingLetterText.innerHTML = '';
+                typingIndex = 0;
+                typeWriter();
+            }
+        });
+
+        closeLetterBtn.addEventListener('click', () => {
+            letterModal.classList.add('opacity-0', 'pointer-events-none');
+            letterModalCard.classList.remove('scale-100');
+            letterModalCard.classList.add('scale-90');
+        });
+
+        /* 7. BACKGROUND MUSIC SYNTHESIZER (WEB AUDIO API) */
+        let audioCtx = null;
+        let isPlaying = false;
+        let timerId = null;
+
+        const notes = [261.63, 329.63, 392.00, 493.88, 523.25, 659.25, 783.99];
+
+        function playRomanticAudio() {
+            if (isPlaying) return;
+            
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            isPlaying = true;
+            document.getElementById('musicLabel').innerText = "Đang phát nhạc 🎵";
+            document.getElementById('musicLabel').classList.remove('opacity-0');
+            setTimeout(() => document.getElementById('musicLabel').classList.add('opacity-0'), 3000);
+
+            let noteIdx = 0;
+            timerId = setInterval(() => {
+                if (!isPlaying) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.value = notes[noteIdx % notes.length];
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.8);
+
+                noteIdx = Math.floor(Math.random() * notes.length);
+            }, 400);
+        }
+
+        function stopRomanticAudio() {
+            isPlaying = false;
+            if (timerId) clearInterval(timerId);
+            document.getElementById('musicLabel').innerText = "Đã tắt nhạc 🔇";
+            document.getElementById('musicLabel').classList.remove('opacity-0');
+            setTimeout(() => document.getElementById('musicLabel').classList.add('opacity-0'), 3000);
+        }
+
+        document.getElementById('musicToggle').addEventListener('click', () => {
+            if (isPlaying) {
+                stopRomanticAudio();
+            } else {
+                playRomanticAudio();
+            }
+        });
+    </script>
+</body>
+</html>
